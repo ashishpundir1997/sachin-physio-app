@@ -52,35 +52,52 @@ export function PatientForm({ initialData }: PatientFormProps) {
 
   const gender = watch("gender");
 
+  // Compress image on client before saving
+  function compressImage(file: File): Promise<Blob> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxSize = 300; // 300x300 max for profile photos
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxSize) { height = (height * maxSize) / width; width = maxSize; }
+        } else {
+          if (height > maxSize) { width = (width * maxSize) / height; height = maxSize; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => resolve(blob!), "image/jpeg", 0.7);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Show preview immediately
-    const reader = new FileReader();
-    reader.onloadend = () => setPhotoPreview(reader.result as string);
-    reader.readAsDataURL(file);
-
-    // Upload
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
 
     try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const { url } = await res.json();
-        setValue("photoUrl", url);
-        toast.success("Photo uploaded");
-      } else {
-        toast.error("Failed to upload photo");
-        setPhotoPreview(null);
-      }
+      // Compress then convert to base64 directly on client
+      const compressed = await compressImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setPhotoPreview(dataUrl);
+        setValue("photoUrl", dataUrl);
+        toast.success("Photo added");
+        setUploading(false);
+      };
+      reader.readAsDataURL(compressed);
     } catch {
-      toast.error("Failed to upload photo");
+      toast.error("Failed to process photo");
       setPhotoPreview(null);
+      setUploading(false);
     }
-    setUploading(false);
   }
 
   function removePhoto() {
