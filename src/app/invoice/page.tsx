@@ -12,7 +12,14 @@ const BRAND = {
 
 interface LineItem {
   description: string;
-  amount: string; // kept as string for editable inputs
+  qty: string; // no. of sessions
+  amount: string; // amount per session (rate); kept as string for editable inputs
+}
+
+function lineTotal(it: LineItem) {
+  const qty = parseFloat(it.qty) || 0;
+  const rate = parseFloat(it.amount) || 0;
+  return qty * rate;
 }
 
 function todayISO() {
@@ -58,6 +65,7 @@ function InvoiceBuilder() {
   const [items, setItems] = useState<LineItem[]>([
     {
       description: params.get("treatment") ?? "Physiotherapy session",
+      qty: "1",
       amount: params.get("amount") ?? "",
     },
   ]);
@@ -65,7 +73,7 @@ function InvoiceBuilder() {
   const [signatory, setSignatory] = useState(""); // optional label
   const [signature, setSignature] = useState<string>(""); // base64 data URL
 
-  const total = items.reduce((sum, it) => sum + (parseFloat(it.amount) || 0), 0);
+  const total = items.reduce((sum, it) => sum + lineTotal(it), 0);
 
   function updateItem(i: number, field: keyof LineItem, value: string) {
     setItems((prev) =>
@@ -73,7 +81,7 @@ function InvoiceBuilder() {
     );
   }
   function addItem() {
-    setItems((prev) => [...prev, { description: "", amount: "" }]);
+    setItems((prev) => [...prev, { description: "", qty: "1", amount: "" }]);
   }
   function removeItem(i: number) {
     setItems((prev) => prev.filter((_, idx) => idx !== i));
@@ -140,9 +148,16 @@ function InvoiceBuilder() {
           <span className="mb-2 block text-sm text-muted-foreground">
             Service details
           </span>
+          <div className="hidden gap-2 px-1 text-xs text-muted-foreground sm:flex">
+            <span className="flex-1">Description</span>
+            <span className="w-20 text-center">Sessions</span>
+            <span className="w-28 text-center">Amount each</span>
+            <span className="w-28 text-right">Line total</span>
+            {items.length > 1 && <span className="w-8" />}
+          </div>
           <div className="space-y-2">
             {items.map((it, i) => (
-              <div key={i} className="flex gap-2">
+              <div key={i} className="flex items-center gap-2">
                 <input
                   className="flex-1 rounded-md border px-3 py-2 text-sm"
                   value={it.description}
@@ -151,16 +166,28 @@ function InvoiceBuilder() {
                 />
                 <input
                   type="number"
-                  className="w-32 rounded-md border px-3 py-2 text-sm"
+                  min="0"
+                  className="w-20 rounded-md border px-3 py-2 text-sm"
+                  value={it.qty}
+                  onChange={(e) => updateItem(i, "qty", e.target.value)}
+                  placeholder="Qty"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  className="w-28 rounded-md border px-3 py-2 text-sm"
                   value={it.amount}
                   onChange={(e) => updateItem(i, "amount", e.target.value)}
                   placeholder="Amount"
                 />
+                <span className="w-28 text-right text-sm font-medium tabular-nums">
+                  {formatINR(lineTotal(it))}
+                </span>
                 {items.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeItem(i)}
-                    className="rounded-md border px-3 text-sm text-red-600 hover:bg-red-50"
+                    className="rounded-md border px-3 py-2 text-sm text-red-600 hover:bg-red-50"
                   >
                     ✕
                   </button>
@@ -341,6 +368,8 @@ function InvoiceBuilder() {
               <tr style={{ backgroundColor: BRAND.blue }} className="text-left text-white">
                 <th className="w-12 px-4 py-3 font-semibold">#</th>
                 <th className="px-4 py-3 font-semibold">Service Details</th>
+                <th className="px-4 py-3 text-center font-semibold">Sessions</th>
+                <th className="px-4 py-3 text-right font-semibold">Amount Each</th>
                 <th className="px-4 py-3 text-right font-semibold">Amount</th>
               </tr>
             </thead>
@@ -353,8 +382,14 @@ function InvoiceBuilder() {
                   <td className="border-b border-gray-200 px-4 py-3">
                     {it.description || "—"}
                   </td>
+                  <td className="border-b border-gray-200 px-4 py-3 text-center tabular-nums">
+                    {parseFloat(it.qty) || 0}
+                  </td>
                   <td className="border-b border-gray-200 px-4 py-3 text-right tabular-nums">
                     {formatINR(parseFloat(it.amount) || 0)}
+                  </td>
+                  <td className="border-b border-gray-200 px-4 py-3 text-right tabular-nums">
+                    {formatINR(lineTotal(it))}
                   </td>
                 </tr>
               ))}
