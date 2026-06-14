@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { CLINIC } from "@/lib/clinic";
 import {
   LayoutDashboard,
   Users,
@@ -22,8 +23,13 @@ export function Sidebar({ className }: { className?: string }) {
 
   return (
     <aside className={cn("flex flex-col w-64 border-r bg-white", className)}>
-      <div className="p-6 border-b">
-        <h1 className="text-xl font-bold text-primary">PhysioCRM</h1>
+      <div className="p-6 border-b flex items-center gap-3">
+        <img
+          src={CLINIC.logoPath}
+          alt={CLINIC.name}
+          className="h-10 w-10 rounded-full object-cover border bg-white shrink-0"
+        />
+        <h1 className="text-xl font-bold text-primary">{CLINIC.shortName}</h1>
       </div>
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item) => {

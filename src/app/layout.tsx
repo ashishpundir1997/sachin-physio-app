@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PhysioCRM",
+  title: "Primemotion",
   description: "Physiotherapy Clinic Management",
 };
 

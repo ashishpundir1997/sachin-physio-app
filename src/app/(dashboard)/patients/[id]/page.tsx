@@ -37,6 +37,7 @@ import {
   CalendarDays,
   IndianRupee,
   Bell,
+  FileText,
 } from "lucide-react";
 
 interface PatientDetail {
@@ -195,6 +196,22 @@ export default function PatientDetailPage() {
     } else {
       toast.error("Failed to add payment");
     }
+  }
+
+  function openInvoice(opts: {
+    treatment: string;
+    amount?: number | null;
+    date: string;
+    notes?: string | null;
+  }) {
+    if (!patient) return;
+    const p = new URLSearchParams();
+    p.set("patient", patient.name);
+    p.set("treatment", opts.treatment);
+    if (opts.amount != null) p.set("amount", String(opts.amount));
+    if (opts.date) p.set("date", opts.date);
+    if (opts.notes) p.set("notes", opts.notes);
+    window.open(`/invoice?${p.toString()}`, "_blank");
   }
 
   if (loading) {
@@ -372,6 +389,22 @@ export default function PatientDetailPage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="gap-1"
+                          onClick={() =>
+                            openInvoice({
+                              treatment: session.treatmentType,
+                              amount: session.payment?.amount ?? null,
+                              date: session.date,
+                              notes: session.notes,
+                            })
+                          }
+                        >
+                          <FileText className="h-3 w-3" />
+                          Invoice
+                        </Button>
                         {session.payment ? (
                           <>
                             <Badge variant={statusColor(session.payment.status)}>

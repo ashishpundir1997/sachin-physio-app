@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LogOut, Menu } from "lucide-react";
 import { Sidebar } from "./sidebar";
+import { CLINIC } from "@/lib/clinic";
 
 export function Header() {
   const router = useRouter();
@@ -28,7 +29,14 @@ export function Header() {
             <Sidebar />
           </SheetContent>
         </Sheet>
-        <h2 className="text-lg font-semibold lg:hidden">PhysioCRM</h2>
+        <div className="flex items-center gap-2 lg:hidden">
+          <img
+            src={CLINIC.logoPath}
+            alt={CLINIC.name}
+            className="h-8 w-8 rounded-full object-cover border bg-white"
+          />
+          <h2 className="text-lg font-semibold">{CLINIC.shortName}</h2>
+        </div>
       </div>
       <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
         <LogOut className="h-4 w-4" />

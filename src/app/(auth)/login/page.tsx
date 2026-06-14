@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CLINIC } from "@/lib/clinic";
 
 export default function LoginPage() {
   const [pin, setPin] = useState("");
@@ -37,7 +38,12 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">PhysioCRM</CardTitle>
+          <img
+            src={CLINIC.logoPath}
+            alt={CLINIC.name}
+            className="h-20 w-20 rounded-full object-cover border bg-white mx-auto mb-2"
+          />
+          <CardTitle className="text-2xl">{CLINIC.shortName}</CardTitle>
           <p className="text-sm text-muted-foreground">Enter your PIN to continue</p>
         </CardHeader>
         <CardContent>

@@ -34,7 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IndianRupee, CheckCircle, Clock, Calendar } from "lucide-react";
+import { IndianRupee, CheckCircle, Clock, Calendar, FileText } from "lucide-react";
 
 interface Payment {
   id: string;
@@ -93,6 +93,16 @@ export default function BillingPage() {
       return true;
     });
   }, [payments, dateRange, customFrom, customTo]);
+
+  function openInvoice(payment: Payment) {
+    const p = new URLSearchParams();
+    p.set("patient", payment.patient.name);
+    p.set("treatment", payment.session.treatmentType);
+    p.set("amount", String(payment.amount));
+    p.set("date", payment.session.date);
+    if (payment.notes) p.set("notes", payment.notes);
+    window.open(`/invoice?${p.toString()}`, "_blank");
+  }
 
   async function markPaid(paymentId: string) {
     const res = await fetch(`/api/payments/${paymentId}`, {
@@ -248,11 +258,22 @@ export default function BillingPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {payment.status === "pending" && (
-                        <Button size="sm" variant="outline" onClick={() => markPaid(payment.id)}>
-                          Mark Paid
+                      <div className="flex items-center justify-end gap-2">
+                        {payment.status === "pending" && (
+                          <Button size="sm" variant="outline" onClick={() => markPaid(payment.id)}>
+                            Mark Paid
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="gap-1"
+                          onClick={() => openInvoice(payment)}
+                        >
+                          <FileText className="h-4 w-4" />
+                          Invoice
                         </Button>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
