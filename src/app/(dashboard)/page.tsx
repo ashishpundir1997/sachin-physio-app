@@ -1,52 +1,23 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
+import {
+  startOfDay,
+  endOfDay,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+} from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Users,
-  CalendarDays,
-  IndianRupee,
-  Bell,
-  Clock,
-  CheckCircle,
-} from "lucide-react";
+import { Users, CalendarDays, IndianRupee, Bell, Clock } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { PeriodToggle } from "@/components/dashboard/period-toggle";
+
+export const dynamic = "force-dynamic";
 
 type Period = "today" | "week" | "month";
-
-interface DashboardData {
-  stats: {
-    totalPatients: number;
-    periodAppointments: number;
-    periodCompleted: number;
-    pendingPaymentsCount: number;
-    upcomingFollowUpsCount: number;
-    periodCollected: number;
-    totalPending: number;
-  };
-  appointments: Array<{
-    id: string;
-    dateTime: string;
-    duration: number;
-    status: string;
-    patient: { id: string; name: string; phone: string };
-  }>;
-  pendingPayments: Array<{
-    id: string;
-    amount: number;
-    patient: { id: string; name: string };
-    session: { treatmentType: string };
-  }>;
-  upcomingFollowUps: Array<{
-    id: string;
-    nextDate: string;
-    reason: string | null;
-    patient: { id: string; name: string };
-  }>;
-}
 
 const periodLabels: Record<Period, string> = {
   today: "Today",
@@ -54,46 +25,99 @@ const periodLabels: Record<Period, string> = {
   month: "This Month",
 };
 
-export default function DashboardPage() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [period, setPeriod] = useState<Period>("today");
-  const [loading, setLoading] = useState(true);
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ period?: string }>;
+}) {
+  const { period: periodParam } = await searchParams;
+  const period: Period =
+    periodParam === "week" || periodParam === "month" ? periodParam : "today";
 
-  useEffect(() => {
-    setLoading(true);
-    fetch(`/api/dashboard?period=${period}`)
-      .then((res) => res.json())
-      .then((d) => {
-        setData(d);
-        setLoading(false);
-      });
-  }, [period]);
+  const now = new Date();
+  let periodStart: Date;
+  let periodEnd: Date;
 
-  if (loading && !data) {
-    return <div className="text-center py-12 text-muted-foreground">Loading dashboard...</div>;
+  if (period === "week") {
+    periodStart = startOfWeek(now, { weekStartsOn: 1 });
+    periodEnd = endOfWeek(now, { weekStartsOn: 1 });
+  } else if (period === "month") {
+    periodStart = startOfMonth(now);
+    periodEnd = endOfMonth(now);
+  } else {
+    periodStart = startOfDay(now);
+    periodEnd = endOfDay(now);
   }
 
-  if (!data) return null;
+  const [
+    totalPatients,
+    periodAppointments,
+    periodCompleted,
+    pendingPaymentsCount,
+    upcomingFollowUpsCount,
+    periodCollected,
+    periodPending,
+    appointments,
+    pendingPayments,
+    upcomingFollowUps,
+  ] = await Promise.all([
+    prisma.patient.count(),
+    prisma.appointment.count({
+      where: { dateTime: { gte: periodStart, lte: periodEnd } },
+    }),
+    prisma.appointment.count({
+      where: { dateTime: { gte: periodStart, lte: periodEnd }, status: "completed" },
+    }),
+    prisma.payment.count({ where: { status: "pending" } }),
+    prisma.followUp.count({
+      where: { status: "pending", nextDate: { gte: startOfDay(now) } },
+    }),
+    prisma.payment.aggregate({
+      where: { status: "paid", paymentDate: { gte: periodStart, lte: periodEnd } },
+      _sum: { amount: true },
+    }),
+    prisma.payment.aggregate({
+      where: { status: "pending" },
+      _sum: { amount: true },
+    }),
+    prisma.appointment.findMany({
+      where: { dateTime: { gte: periodStart, lte: periodEnd } },
+      orderBy: { dateTime: "asc" },
+      include: { patient: { select: { id: true, name: true, phone: true } } },
+      take: 15,
+    }),
+    prisma.payment.findMany({
+      where: { status: "pending" },
+      orderBy: { createdAt: "desc" },
+      include: {
+        patient: { select: { id: true, name: true } },
+        session: { select: { treatmentType: true } },
+      },
+      take: 10,
+    }),
+    prisma.followUp.findMany({
+      where: { status: "pending", nextDate: { gte: startOfDay(now) } },
+      orderBy: { nextDate: "asc" },
+      include: { patient: { select: { id: true, name: true } } },
+      take: 10,
+    }),
+  ]);
 
-  const { stats } = data;
+  const stats = {
+    totalPatients,
+    periodAppointments,
+    periodCompleted,
+    pendingPaymentsCount,
+    upcomingFollowUpsCount,
+    periodCollected: periodCollected._sum.amount || 0,
+    totalPending: periodPending._sum.amount || 0,
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <div className="flex items-center gap-1 bg-gray-100 rounded-md p-1">
-          {(["today", "week", "month"] as Period[]).map((p) => (
-            <Button
-              key={p}
-              size="sm"
-              variant={period === p ? "default" : "ghost"}
-              onClick={() => setPeriod(p)}
-              className="text-xs px-3"
-            >
-              {periodLabels[p]}
-            </Button>
-          ))}
-        </div>
+        <PeriodToggle period={period} />
       </div>
 
       {/* Stats Grid */}
@@ -171,10 +195,10 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
-            {data.appointments.length === 0 ? (
+            {appointments.length === 0 ? (
               <p className="text-sm text-muted-foreground py-2">No appointments</p>
             ) : (
-              data.appointments.map((apt) => (
+              appointments.map((apt) => (
                 <div
                   key={apt.id}
                   className="flex items-center justify-between py-2 border-b last:border-0"
@@ -221,10 +245,10 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
-            {data.pendingPayments.length === 0 ? (
+            {pendingPayments.length === 0 ? (
               <p className="text-sm text-muted-foreground py-2">All payments collected!</p>
             ) : (
-              data.pendingPayments.map((payment) => (
+              pendingPayments.map((payment) => (
                 <div
                   key={payment.id}
                   className="flex items-center justify-between py-2 border-b last:border-0"
@@ -258,10 +282,10 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {data.upcomingFollowUps.length === 0 ? (
+            {upcomingFollowUps.length === 0 ? (
               <p className="text-sm text-muted-foreground py-2">No upcoming follow-ups</p>
             ) : (
-              data.upcomingFollowUps.map((fu) => (
+              upcomingFollowUps.map((fu) => (
                 <div
                   key={fu.id}
                   className="flex items-center justify-between py-2 border-b last:border-0"
