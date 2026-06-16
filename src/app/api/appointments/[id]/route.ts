@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { appointmentSchema } from "@/lib/validators";
+import { revalidateCrm } from "@/lib/revalidate";
 
 export async function GET(
   _request: NextRequest,
@@ -39,6 +40,7 @@ export async function PUT(
     data: result.data,
   });
 
+  revalidateCrm();
   return NextResponse.json(appointment);
 }
 
@@ -48,5 +50,6 @@ export async function DELETE(
 ) {
   const { id } = await params;
   await prisma.appointment.delete({ where: { id } });
+  revalidateCrm();
   return NextResponse.json({ success: true });
 }

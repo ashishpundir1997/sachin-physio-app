@@ -14,8 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Users, CalendarDays, IndianRupee, Bell, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PeriodToggle } from "@/components/dashboard/period-toggle";
-
-export const dynamic = "force-dynamic";
+import { unstable_cache } from "next/cache";
 
 type Period = "today" | "week" | "month";
 
@@ -25,31 +24,26 @@ const periodLabels: Record<Period, string> = {
   month: "This Month",
 };
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ period?: string }>;
-}) {
-  const { period: periodParam } = await searchParams;
-  const period: Period =
-    periodParam === "week" || periodParam === "month" ? periodParam : "today";
+// Cached per period under the "dashboard" tag — repeat visits skip the DB.
+// revalidateCrm() busts this tag on any write, so it never goes stale.
+const getDashboardData = unstable_cache(
+  async (period: Period) => {
+    const now = new Date();
+    let periodStart: Date;
+    let periodEnd: Date;
 
-  const now = new Date();
-  let periodStart: Date;
-  let periodEnd: Date;
+    if (period === "week") {
+      periodStart = startOfWeek(now, { weekStartsOn: 1 });
+      periodEnd = endOfWeek(now, { weekStartsOn: 1 });
+    } else if (period === "month") {
+      periodStart = startOfMonth(now);
+      periodEnd = endOfMonth(now);
+    } else {
+      periodStart = startOfDay(now);
+      periodEnd = endOfDay(now);
+    }
 
-  if (period === "week") {
-    periodStart = startOfWeek(now, { weekStartsOn: 1 });
-    periodEnd = endOfWeek(now, { weekStartsOn: 1 });
-  } else if (period === "month") {
-    periodStart = startOfMonth(now);
-    periodEnd = endOfMonth(now);
-  } else {
-    periodStart = startOfDay(now);
-    periodEnd = endOfDay(now);
-  }
-
-  const [
+    const [
     totalPatients,
     periodAppointments,
     periodCompleted,
@@ -101,17 +95,38 @@ export default async function DashboardPage({
       include: { patient: { select: { id: true, name: true } } },
       take: 10,
     }),
-  ]);
+    ]);
 
-  const stats = {
-    totalPatients,
-    periodAppointments,
-    periodCompleted,
-    pendingPaymentsCount,
-    upcomingFollowUpsCount,
-    periodCollected: periodCollected._sum.amount || 0,
-    totalPending: periodPending._sum.amount || 0,
-  };
+    return {
+      stats: {
+        totalPatients,
+        periodAppointments,
+        periodCompleted,
+        pendingPaymentsCount,
+        upcomingFollowUpsCount,
+        periodCollected: periodCollected._sum.amount || 0,
+        totalPending: periodPending._sum.amount || 0,
+      },
+      appointments,
+      pendingPayments,
+      upcomingFollowUps,
+    };
+  },
+  ["dashboard-data"],
+  { revalidate: 120, tags: ["dashboard"] }
+);
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ period?: string }>;
+}) {
+  const { period: periodParam } = await searchParams;
+  const period: Period =
+    periodParam === "week" || periodParam === "month" ? periodParam : "today";
+
+  const { stats, appointments, pendingPayments, upcomingFollowUps } =
+    await getDashboardData(period);
 
   return (
     <div className="space-y-6">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { followUpSchema } from "@/lib/validators";
+import { revalidateCrm } from "@/lib/revalidate";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -31,5 +32,6 @@ export async function POST(request: NextRequest) {
   }
 
   const followUp = await prisma.followUp.create({ data: result.data });
+  revalidateCrm();
   return NextResponse.json(followUp, { status: 201 });
 }

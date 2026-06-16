@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { patientSchema } from "@/lib/validators";
+import { revalidateCrm } from "@/lib/revalidate";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -35,5 +36,6 @@ export async function POST(request: NextRequest) {
   }
 
   const patient = await prisma.patient.create({ data: result.data });
+  revalidateCrm();
   return NextResponse.json(patient, { status: 201 });
 }

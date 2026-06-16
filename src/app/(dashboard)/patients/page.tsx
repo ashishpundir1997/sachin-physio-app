@@ -4,7 +4,9 @@ import { Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PatientsList } from "@/components/patients/patients-list";
 
-export const dynamic = "force-dynamic";
+// Cached (ISR): repeat visits are served instantly without re-querying.
+// Invalidated immediately on any write via revalidateCrm().
+export const revalidate = 120;
 
 export default async function PatientsPage() {
   const patients = await prisma.patient.findMany({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { appointmentSchema } from "@/lib/validators";
+import { revalidateCrm } from "@/lib/revalidate";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 
 export async function GET(request: NextRequest) {
@@ -57,5 +58,6 @@ export async function POST(request: NextRequest) {
     include: { patient: { select: { name: true } } },
   });
 
+  revalidateCrm();
   return NextResponse.json(appointment, { status: 201 });
 }

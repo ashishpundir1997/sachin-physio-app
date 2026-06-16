@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { paymentSchema } from "@/lib/validators";
+import { revalidateCrm } from "@/lib/revalidate";
 
 export async function PUT(
   request: NextRequest,
@@ -19,6 +20,7 @@ export async function PUT(
     data: result.data,
   });
 
+  revalidateCrm();
   return NextResponse.json(payment);
 }
 
@@ -28,5 +30,6 @@ export async function DELETE(
 ) {
   const { id } = await params;
   await prisma.payment.delete({ where: { id } });
+  revalidateCrm();
   return NextResponse.json({ success: true });
 }
