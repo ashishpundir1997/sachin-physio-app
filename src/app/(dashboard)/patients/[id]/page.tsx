@@ -358,7 +358,7 @@ export default function PatientDetailPage() {
               <Card>
                 <CardContent className="p-3 text-center">
                   <p className="text-xs text-muted-foreground">Paid</p>
-                  <p className="text-lg font-bold text-green-600">
+                  <p className="text-lg font-bold text-emerald-600">
                     ₹{patient.sessions.reduce((sum, s) => sum + (s.payment?.status === "paid" ? s.payment.amount : 0), 0).toLocaleString()}
                   </p>
                 </CardContent>
@@ -366,7 +366,7 @@ export default function PatientDetailPage() {
               <Card>
                 <CardContent className="p-3 text-center">
                   <p className="text-xs text-muted-foreground">Pending</p>
-                  <p className="text-lg font-bold text-yellow-600">
+                  <p className="text-lg font-bold text-amber-600">
                     ₹{patient.sessions.reduce((sum, s) => sum + (s.payment?.status === "pending" ? s.payment.amount : 0), 0).toLocaleString()}
                   </p>
                 </CardContent>

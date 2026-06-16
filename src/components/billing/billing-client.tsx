@@ -126,14 +126,14 @@ export function BillingClient({ initialPayments }: { initialPayments: Payment[] 
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Billing</h1>
+      <h1 className="text-2xl font-bold brand-text-gradient">Billing</h1>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-              <CheckCircle className="h-5 w-5 text-green-600" />
+            <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center">
+              <CheckCircle className="h-5 w-5 text-emerald-700 dark:text-emerald-300" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Collected</p>
@@ -143,8 +143,8 @@ export function BillingClient({ initialPayments }: { initialPayments: Payment[] 
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-yellow-600" />
+            <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-950 flex items-center justify-center">
+              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Pending</p>
@@ -154,8 +154,8 @@ export function BillingClient({ initialPayments }: { initialPayments: Payment[] 
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <IndianRupee className="h-5 w-5 text-blue-600" />
+            <div className="h-10 w-10 rounded-full bg-teal-100 dark:bg-teal-950 flex items-center justify-center">
+              <IndianRupee className="h-5 w-5 text-teal-700 dark:text-teal-300" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Total</p>
@@ -171,7 +171,7 @@ export function BillingClient({ initialPayments }: { initialPayments: Payment[] 
       <div className="flex flex-wrap items-end gap-3">
         <div>
           <p className="text-xs text-muted-foreground mb-1">Period</p>
-          <div className="flex items-center gap-1 bg-gray-100 rounded-md p-1">
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
             {([
               { value: "today", label: "Today" },
               { value: "week", label: "This Week" },

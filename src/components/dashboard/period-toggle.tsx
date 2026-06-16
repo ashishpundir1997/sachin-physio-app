@@ -13,7 +13,7 @@ const periodLabels: Record<Period, string> = {
 
 export function PeriodToggle({ period }: { period: Period }) {
   return (
-    <div className="flex items-center gap-1 bg-gray-100 rounded-md p-1">
+    <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
       {(["today", "week", "month"] as Period[]).map((p) => (
         <Link key={p} href={`/?period=${p}`} scroll={false}>
           <Button

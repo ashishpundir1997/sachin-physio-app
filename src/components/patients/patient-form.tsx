@@ -138,13 +138,13 @@ export function PatientForm({ initialData }: PatientFormProps) {
         <Label>Patient Photo</Label>
         <div className="flex items-center gap-4">
           <div
-            className="relative h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-gray-300 hover:border-primary transition-colors"
+            className="relative h-20 w-20 rounded-full bg-muted flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-border hover:border-primary transition-colors"
             onClick={() => fileInputRef.current?.click()}
           >
             {photoPreview ? (
               <img src={photoPreview} alt="Preview" className="h-full w-full object-cover" />
             ) : (
-              <User className="h-8 w-8 text-gray-400" />
+              <User className="h-8 w-8 text-muted-foreground" />
             )}
             {uploading && (
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -169,7 +169,7 @@ export function PatientForm({ initialData }: PatientFormProps) {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="gap-1 text-red-500 hover:text-red-600"
+                className="gap-1 text-destructive hover:text-destructive/80"
                 onClick={removePhoto}
               >
                 <X className="h-3 w-3" />
@@ -192,7 +192,7 @@ export function PatientForm({ initialData }: PatientFormProps) {
           <Label htmlFor="name">Name *</Label>
           <Input id="name" {...register("name")} placeholder="Patient name" />
           {errors.name && (
-            <p className="text-sm text-red-500">{errors.name.message}</p>
+            <p className="text-sm text-destructive">{errors.name.message}</p>
           )}
         </div>
 
@@ -200,7 +200,7 @@ export function PatientForm({ initialData }: PatientFormProps) {
           <Label htmlFor="phone">Phone *</Label>
           <Input id="phone" {...register("phone")} placeholder="Phone number" />
           {errors.phone && (
-            <p className="text-sm text-red-500">{errors.phone.message}</p>
+            <p className="text-sm text-destructive">{errors.phone.message}</p>
           )}
         </div>
 

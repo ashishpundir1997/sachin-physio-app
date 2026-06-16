@@ -35,7 +35,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 to-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <img
@@ -43,7 +43,7 @@ export default function LoginPage() {
             alt={CLINIC.name}
             className="h-20 w-20 rounded-full object-cover border bg-white mx-auto mb-2"
           />
-          <CardTitle className="text-2xl">{CLINIC.shortName}</CardTitle>
+          <CardTitle className="text-2xl brand-text-gradient">{CLINIC.shortName}</CardTitle>
           <p className="text-sm text-muted-foreground">Enter your PIN to continue</p>
         </CardHeader>
         <CardContent>
@@ -57,8 +57,12 @@ export default function LoginPage() {
               autoFocus
               className="text-center text-lg tracking-widest"
             />
-            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading || !pin}>
+            {error && <p className="text-sm text-destructive text-center">{error}</p>}
+            <Button
+              type="submit"
+              className="w-full btn-brand-gradient"
+              disabled={loading || !pin}
+            >
               {loading ? "Verifying..." : "Login"}
             </Button>
           </form>

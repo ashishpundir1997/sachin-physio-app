@@ -116,7 +116,7 @@ export default async function DashboardPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold brand-text-gradient">Dashboard</h1>
         <PeriodToggle period={period} />
       </div>
 
@@ -124,8 +124,8 @@ export default async function DashboardPage({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <Users className="h-5 w-5 text-blue-600" />
+            <div className="h-10 w-10 rounded-full bg-teal-100 dark:bg-teal-950 flex items-center justify-center">
+              <Users className="h-5 w-5 text-teal-700 dark:text-teal-300" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Total Patients</p>
@@ -136,15 +136,15 @@ export default async function DashboardPage({
 
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-              <CalendarDays className="h-5 w-5 text-purple-600" />
+            <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+              <CalendarDays className="h-5 w-5 text-slate-600 dark:text-slate-300" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">{periodLabels[period]} Appts</p>
               <p className="text-2xl font-bold">
                 {stats.periodAppointments}
                 {stats.periodCompleted > 0 && (
-                  <span className="text-sm font-normal text-green-600 ml-1">
+                  <span className="text-sm font-normal text-emerald-600 ml-1">
                     ({stats.periodCompleted} done)
                   </span>
                 )}
@@ -155,8 +155,8 @@ export default async function DashboardPage({
 
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-              <IndianRupee className="h-5 w-5 text-green-600" />
+            <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center">
+              <IndianRupee className="h-5 w-5 text-emerald-700 dark:text-emerald-300" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">{periodLabels[period]} Collected</p>
@@ -167,8 +167,8 @@ export default async function DashboardPage({
 
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-yellow-600" />
+            <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-950 flex items-center justify-center">
+              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Pending</p>
@@ -264,7 +264,7 @@ export default async function DashboardPage({
                       {payment.session.treatmentType}
                     </p>
                   </div>
-                  <span className="text-sm font-semibold text-yellow-600">
+                  <span className="text-sm font-semibold text-amber-600">
                     ₹{payment.amount.toLocaleString()}
                   </span>
                 </div>

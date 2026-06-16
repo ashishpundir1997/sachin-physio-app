@@ -229,7 +229,7 @@ export function AppointmentsClient({
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Appointments</h1>
+        <h1 className="text-2xl font-bold brand-text-gradient">Appointments</h1>
         <Link href="/appointments/new">
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
@@ -240,7 +240,7 @@ export function AppointmentsClient({
 
       {/* View Toggle + Date Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="flex items-center gap-1 bg-gray-100 rounded-md p-1">
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
           {(["day", "week", "month"] as ViewMode[]).map((v) => (
             <Button
               key={v}

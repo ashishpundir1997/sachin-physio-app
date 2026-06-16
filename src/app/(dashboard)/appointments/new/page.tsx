@@ -119,7 +119,7 @@ function NewAppointmentForm() {
 export default function NewAppointmentPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Book Appointment</h1>
+      <h1 className="text-2xl font-bold brand-text-gradient">Book Appointment</h1>
       <Suspense fallback={<div className="text-muted-foreground">Loading...</div>}>
         <NewAppointmentForm />
       </Suspense>

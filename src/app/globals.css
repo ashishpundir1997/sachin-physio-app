@@ -38,6 +38,20 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Brand palette — teal core + emerald accent */
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-alt-500: var(--brand-alt-500);
+  --color-brand-alt-600: var(--brand-alt-600);
+  --color-brand-alt-700: var(--brand-alt-700);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -54,32 +68,45 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --primary: hsl(175 84% 32%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(210 40% 96.1%);
+  --secondary-foreground: hsl(222.2 47.4% 11.2%);
+  --muted: hsl(210 40% 96.1%);
+  --muted-foreground: hsl(215.4 16.3% 46.9%);
+  --accent: hsl(166 76% 97%);
+  --accent-foreground: hsl(175 77% 26%);
   --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: hsl(214.3 31.8% 91.4%);
+  --input: hsl(214.3 31.8% 91.4%);
+  --ring: hsl(175 84% 32%);
+  --chart-1: hsl(173 80% 40%);
+  --chart-2: hsl(160 84% 39%);
+  --chart-3: hsl(175 77% 26%);
+  --chart-4: hsl(172 66% 50%);
+  --chart-5: hsl(158 64% 42%);
+  --radius: 0.75rem;
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(222.2 47.4% 11.2%);
+  --sidebar-primary: hsl(175 84% 32%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(166 76% 97%);
+  --sidebar-accent-foreground: hsl(175 77% 26%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(175 84% 32%);
+
+  /* Brand palette — teal core + emerald accent */
+  --brand-50: hsl(166 76% 97%);
+  --brand-100: hsl(167 85% 89%);
+  --brand-200: hsl(168 84% 78%);
+  --brand-400: hsl(172 66% 50%);
+  --brand-500: hsl(173 80% 40%);
+  --brand-600: hsl(175 84% 32%);
+  --brand-700: hsl(175 77% 26%);
+  --brand-800: hsl(176 69% 22%);
+  --brand-alt-500: hsl(160 84% 39%);
+  --brand-alt-600: hsl(158 64% 42%);
+  --brand-alt-700: hsl(158 75% 32%);
 }
 
 .dark {
@@ -89,31 +116,44 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.87 0.00 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: hsl(173 80% 40%);
+  --primary-foreground: hsl(0 0% 100%);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: hsl(176 69% 22%);
+  --accent-foreground: hsl(167 85% 89%);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
+  --ring: hsl(173 80% 40%);
+  --chart-1: hsl(173 80% 40%);
+  --chart-2: hsl(160 84% 39%);
+  --chart-3: hsl(168 84% 78%);
+  --chart-4: hsl(172 66% 50%);
+  --chart-5: hsl(158 64% 42%);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-primary: hsl(173 80% 40%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(176 69% 22%);
+  --sidebar-accent-foreground: hsl(167 85% 89%);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: hsl(173 80% 40%);
+
+  /* Brand palette — teal core + emerald accent (shared) */
+  --brand-50: hsl(166 76% 97%);
+  --brand-100: hsl(167 85% 89%);
+  --brand-200: hsl(168 84% 78%);
+  --brand-400: hsl(172 66% 50%);
+  --brand-500: hsl(173 80% 40%);
+  --brand-600: hsl(175 84% 32%);
+  --brand-700: hsl(175 77% 26%);
+  --brand-800: hsl(176 69% 22%);
+  --brand-alt-500: hsl(160 84% 39%);
+  --brand-alt-600: hsl(158 64% 42%);
+  --brand-alt-700: hsl(158 75% 32%);
 }
 
 @layer base {
@@ -125,5 +165,32 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  /* Primary teal→emerald gradient button */
+  .btn-brand-gradient {
+    background: linear-gradient(to right, var(--brand-700), var(--brand-alt-700));
+    color: white;
+    transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .btn-brand-gradient:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 10px 25px -5px hsl(175 77% 26% / 0.35);
+  }
+
+  /* Gradient text for page titles / brand wordmark */
+  .brand-text-gradient {
+    background: linear-gradient(to right, var(--brand-600), var(--brand-alt-600));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Dashboard hero stat card (teal→emerald fill) */
+  .stat-card {
+    @apply relative overflow-hidden rounded-xl p-6 text-white shadow-lg;
+    background: linear-gradient(to bottom right, var(--brand-500), var(--brand-alt-600));
   }
 }

@@ -24,7 +24,7 @@ export default function EditPatientPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Edit Patient</h1>
+      <h1 className="text-2xl font-bold brand-text-gradient">Edit Patient</h1>
       {patient && <PatientForm initialData={patient} />}
     </div>
   );
