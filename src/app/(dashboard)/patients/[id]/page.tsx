@@ -35,6 +35,7 @@ import {
   MapPin,
   Plus,
   CalendarDays,
+  CalendarPlus,
   IndianRupee,
   Bell,
   FileText,
@@ -64,6 +65,8 @@ interface PatientDetail {
     bodyPart: string | null;
     duration: number;
     date: string;
+    startedAt: string | null;
+    endedAt: string | null;
     notes: string | null;
     payment: { id: string; amount: number; status: string } | null;
   }>;
@@ -248,6 +251,10 @@ export default function PatientDetailPage() {
               {patient.age && <span>{patient.age} years</span>}
               {patient.gender && <span className="capitalize">{patient.gender}</span>}
             </div>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+              <CalendarPlus className="h-3 w-3" />
+              Patient since {format(new Date(patient.createdAt), "PPP 'at' p")}
+            </div>
           </div>
         </div>
         <div className="flex gap-2">
@@ -385,6 +392,9 @@ export default function PatientDetailPage() {
                         <p className="text-sm font-medium">{session.treatmentType}</p>
                         <p className="text-xs text-muted-foreground">
                           {format(new Date(session.date), "PPP")} — {session.duration} min
+                          {session.startedAt && session.endedAt
+                            ? ` (${format(new Date(session.startedAt), "p")}–${format(new Date(session.endedAt), "p")})`
+                            : ""}
                           {session.bodyPart ? ` — ${session.bodyPart}` : ""}
                         </p>
                       </div>

@@ -27,6 +27,8 @@ export const sessionSchema = z.object({
   notes: z.string().optional().nullable(),
   duration: z.coerce.number().int().positive(),
   date: z.coerce.date(),
+  startedAt: z.coerce.date().optional().nullable(),
+  endedAt: z.coerce.date().optional().nullable(),
 });
 
 export const paymentSchema = z.object({

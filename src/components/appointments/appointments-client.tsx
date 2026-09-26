@@ -34,7 +34,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Plus, ChevronLeft, ChevronRight, Clock, User } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Clock, User, Play, Square } from "lucide-react";
+
+function formatElapsed(ms: number) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
 export interface Appointment {
   id: string;
@@ -68,7 +75,51 @@ export function AppointmentsClient({
   const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
   const [loading, setLoading] = useState(false);
   const [sessionDialog, setSessionDialog] = useState<Appointment | null>(null);
+  // Sessions currently running: appointment id -> start time
+  const [runningSessions, setRunningSessions] = useState<Record<string, Date>>({});
+  // Sessions ended (timer stopped) but not yet saved: appointment id -> times
+  const [pendingSessions, setPendingSessions] = useState<
+    Record<string, { start: Date; end: Date; minutes: number }>
+  >({});
+  const [durationInput, setDurationInput] = useState("30");
+  const [tick, setTick] = useState(() => new Date());
   const didMount = useRef(false);
+
+  function openSessionDialog(apt: Appointment) {
+    const pending = pendingSessions[apt.id];
+    setDurationInput(String(pending ? pending.minutes : apt.duration || 30));
+    setSessionDialog(apt);
+  }
+
+  function closeSessionDialog() {
+    setSessionDialog(null);
+  }
+
+  function handleStartSession(apt: Appointment) {
+    setRunningSessions((prev) => ({ ...prev, [apt.id]: new Date() }));
+  }
+
+  function handleEndSession(apt: Appointment) {
+    const start = runningSessions[apt.id];
+    if (!start) return;
+    const end = new Date();
+    const minutes = Math.max(1, Math.round((end.getTime() - start.getTime()) / 60000));
+    setRunningSessions((prev) => {
+      const next = { ...prev };
+      delete next[apt.id];
+      return next;
+    });
+    setPendingSessions((prev) => ({ ...prev, [apt.id]: { start, end, minutes } }));
+    setDurationInput(String(minutes));
+    setSessionDialog(apt);
+  }
+
+  // Live-tick elapsed timers while any session is running.
+  useEffect(() => {
+    if (Object.keys(runningSessions).length === 0) return;
+    const t = setInterval(() => setTick(new Date()), 1000);
+    return () => clearInterval(t);
+  }, [runningSessions]);
 
   function fetchAppointments(d: Date, v: ViewMode) {
     setLoading(true);
@@ -122,6 +173,7 @@ export function AppointmentsClient({
     e.preventDefault();
     if (!sessionDialog) return;
     const form = new FormData(e.currentTarget);
+    const pending = pendingSessions[sessionDialog.id];
 
     const sessionRes = await fetch("/api/sessions", {
       method: "POST",
@@ -134,6 +186,8 @@ export function AppointmentsClient({
         notes: form.get("notes") || null,
         duration: Number(form.get("duration")) || sessionDialog.duration,
         date: sessionDialog.dateTime,
+        startedAt: pending ? pending.start.toISOString() : null,
+        endedAt: pending ? pending.end.toISOString() : null,
       }),
     });
 
@@ -162,7 +216,12 @@ export function AppointmentsClient({
     }
 
     toast.success("Session recorded & appointment completed");
-    setSessionDialog(null);
+    setPendingSessions((prev) => {
+      const next = { ...prev };
+      delete next[sessionDialog.id];
+      return next;
+    });
+    closeSessionDialog();
     fetchAppointments(date, view);
   }
 
@@ -208,9 +267,26 @@ export function AppointmentsClient({
               <Badge variant={statusColor(apt.status)}>{apt.status}</Badge>
               {apt.status === "scheduled" && (
                 <>
-                  <Button size="sm" variant="outline" onClick={() => setSessionDialog(apt)}>
-                    Record Session
-                  </Button>
+                  {pendingSessions[apt.id] ? (
+                    <Button size="sm" variant="outline" className="gap-1" onClick={() => openSessionDialog(apt)}>
+                      Complete Session ({pendingSessions[apt.id].minutes} min)
+                    </Button>
+                  ) : runningSessions[apt.id] ? (
+                    <>
+                      <span className="text-sm font-medium tabular-nums text-primary">
+                        {formatElapsed(tick.getTime() - runningSessions[apt.id].getTime())}
+                      </span>
+                      <Button size="sm" variant="outline" className="gap-1" onClick={() => handleEndSession(apt)}>
+                        <Square className="h-3 w-3" />
+                        End Session
+                      </Button>
+                    </>
+                  ) : (
+                    <Button size="sm" variant="outline" className="gap-1" onClick={() => handleStartSession(apt)}>
+                      <Play className="h-3 w-3" />
+                      Start Session
+                    </Button>
+                  )}
                   <Button size="sm" variant="ghost" onClick={() => updateStatus(apt.id, "no-show")}>
                     No Show
                   </Button>
@@ -305,12 +381,23 @@ export function AppointmentsClient({
       )}
 
       {/* Session Dialog */}
-      <Dialog open={!!sessionDialog} onOpenChange={(open) => !open && setSessionDialog(null)}>
+      <Dialog open={!!sessionDialog} onOpenChange={(open) => !open && closeSessionDialog()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Record Session — {sessionDialog?.patient.name}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSession} className="space-y-4">
+            {sessionDialog && pendingSessions[sessionDialog.id] && (
+              <div className="rounded-lg border bg-muted/40 p-3 text-sm">
+                <p className="font-medium">Session timed</p>
+                <p className="text-xs text-muted-foreground">
+                  {format(pendingSessions[sessionDialog.id].start, "p")} –{" "}
+                  {format(pendingSessions[sessionDialog.id].end, "p")} (
+                  {pendingSessions[sessionDialog.id].minutes} min)
+                </p>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="treatmentType">Treatment Type *</Label>
@@ -323,7 +410,18 @@ export function AppointmentsClient({
             </div>
             <div className="space-y-2">
               <Label htmlFor="session-duration">Duration (min)</Label>
-              <Input id="session-duration" name="duration" type="number" defaultValue={sessionDialog?.duration || 30} />
+              <Input
+                id="session-duration"
+                name="duration"
+                type="number"
+                value={durationInput}
+                onChange={(e) => setDurationInput(e.target.value)}
+              />
+              {sessionDialog && pendingSessions[sessionDialog.id] && (
+                <p className="text-xs text-muted-foreground">
+                  Pre-filled from the session timer — adjust if needed.
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="session-notes">Session Notes</Label>

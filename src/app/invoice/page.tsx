@@ -70,10 +70,13 @@ function InvoiceBuilder() {
     },
   ]);
   const [notes, setNotes] = useState(params.get("notes") ?? "");
+  const [discount, setDiscount] = useState(""); // optional flat discount amount
   const [signatory, setSignatory] = useState(""); // optional label
   const [signature, setSignature] = useState<string>(""); // base64 data URL
 
-  const total = items.reduce((sum, it) => sum + lineTotal(it), 0);
+  const subtotal = items.reduce((sum, it) => sum + lineTotal(it), 0);
+  const discountAmount = Math.min(parseFloat(discount) || 0, subtotal);
+  const total = subtotal - discountAmount;
 
   function updateItem(i: number, field: keyof LineItem, value: string) {
     setItems((prev) =>
@@ -203,6 +206,18 @@ function InvoiceBuilder() {
             + Add line
           </button>
         </div>
+
+        <label className="mt-4 block max-w-xs text-sm">
+          <span className="mb-1 block text-muted-foreground">Discount ₹ (optional)</span>
+          <input
+            type="number"
+            min="0"
+            className="w-full rounded-md border px-3 py-2"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
+            placeholder="0"
+          />
+        </label>
 
         <label className="mt-4 block text-sm">
           <span className="mb-1 block text-muted-foreground">Notes (optional)</span>
@@ -400,14 +415,28 @@ function InvoiceBuilder() {
         {/* Spacer pushes the totals & footer to the bottom of the page */}
         <div className="flex-1" />
 
-        {/* Total Payment (bottom, right aligned) */}
+        {/* Totals (bottom, right aligned) */}
         <div className="mx-12 flex justify-end">
-          <div
-            className="flex w-72 justify-between rounded-md px-4 py-3 text-base font-bold text-white"
-            style={{ backgroundColor: BRAND.green }}
-          >
-            <span>Total Payment</span>
-            <span className="tabular-nums">{formatINR(total)}</span>
+          <div className="w-72">
+            {discountAmount > 0 && (
+              <div className="mb-2 space-y-1 rounded-md bg-gray-50 px-4 py-2 text-sm">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span className="tabular-nums">{formatINR(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Discount</span>
+                  <span className="tabular-nums">− {formatINR(discountAmount)}</span>
+                </div>
+              </div>
+            )}
+            <div
+              className="flex justify-between rounded-md px-4 py-3 text-base font-bold text-white"
+              style={{ backgroundColor: BRAND.green }}
+            >
+              <span>Total Payment</span>
+              <span className="tabular-nums">{formatINR(total)}</span>
+            </div>
           </div>
         </div>
 
